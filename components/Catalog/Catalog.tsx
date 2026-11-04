@@ -1,7 +1,8 @@
 "use client";
-
+import css from "./Catalog.module.css";
 import { useCars } from "@/hooks/useCars";
 import type { CarFilters } from "@/types/car";
+import CarCard from "@/components/CarCard/CarCard";
 
 export default function Catalog() {
   const filters: CarFilters = {};
@@ -27,25 +28,30 @@ export default function Catalog() {
   }
 
   return (
-    <section>
-      <h1>Каталог автомобілів</h1>
+    <section className={css.catalog}>
+      <h1 className={css.title}>Каталог автомобілів</h1>
 
-      {cars.length === 0 && <p>Автомобілів не знайдено.</p>}
+      {cars.length === 0 && (
+        <p className={css.message}>Автомобілів не знайдено.</p>
+      )}
 
-      <ul>
+      <ul className={css.list}>
         {cars.map((car) => (
-          <li key={car.id}>
-            {car.brand} {car.model} — ${car.rentalPrice}
+          <li key={car.id} className={css.item}>
+            <CarCard car={car} />
           </li>
         ))}
       </ul>
 
       {isError && data && (
-        <p role="alert">Не вдалося оновити список: {error.message}</p>
+        <p className={css.error} role="alert">
+          Не вдалося оновити список: {error.message}
+        </p>
       )}
 
       {hasNextPage && (
         <button
+          className={css.loadMore}
           type="button"
           onClick={() => void fetchNextPage()}
           disabled={isFetchingNextPage}
