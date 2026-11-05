@@ -2,6 +2,7 @@
 
 import { useState, type SubmitEvent } from "react";
 import css from "./RentalForm.module.css";
+import { createBookingRequest } from "@/lib/api/rentals";
 
 interface RentalFormProps {
   carId: string;
@@ -9,6 +10,7 @@ interface RentalFormProps {
 
 export default function RentalForm({ carId }: RentalFormProps) {
   const [message, setMessage] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const today = new Date();
   const minDate = [
@@ -17,14 +19,20 @@ export default function RentalForm({ carId }: RentalFormProps) {
     String(today.getDate()).padStart(2, "0"),
   ].join("-");
 
-  function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
+  async function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    const formData = new FormData(event.currentTarget);
+    if (isSubmitting) {
+      return;
+    }
+
+    const form = event.currentTarget;
+    const formData = new FormData(form);
 
     const name = String(formData.get("name") ?? "").trim();
     const email = String(formData.get("email") ?? "").trim();
     const bookingDate = String(formData.get("bookingDate") ?? "");
+    const comment = String(formData.get("comment") ?? "").trim();
 
     if (!name || !email || !bookingDate) {
       setMessage("Заповніть усі обов’язкові поля.");
@@ -36,7 +44,29 @@ export default function RentalForm({ carId }: RentalFormProps) {
       return;
     }
 
-    setMessage("Дані перевірено. Надсилання заявки ще не підключено.");
+    setIsSubmitting(true);
+    setMessage("");
+
+    try {
+      await createBookingRequest(carId, {
+        name,
+        email,
+        comment: [`Requested booking date: ${bookingDate}`, comment]
+          .filter(Boolean)
+          .join("\n"),
+      });
+
+      form.reset();
+      setMessage("Заявку надіслано! Очікуйте підтвердження.");
+    } catch (error) {
+      setMessage(
+        error instanceof Error
+          ? error.message
+          : "Не вдалося надіслати заявку. Спробуйте ще раз.",
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   return (
@@ -95,8 +125,8 @@ export default function RentalForm({ carId }: RentalFormProps) {
         />
       </label>
 
-      <button className={css.button} type="submit">
-        Send
+      <button className={css.button} type="submit" disabled={isSubmitting}>
+        {isSubmitting ? "Sending..." : "Send"}
       </button>
 
       <p className={css.message} role="status">
