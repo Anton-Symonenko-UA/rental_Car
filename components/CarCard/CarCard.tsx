@@ -17,7 +17,6 @@ export default function CarCard({ car }: CarCardProps) {
         height={268}
         loading="lazy"
       />
-
       <div className={css.heading}>
         <h2 className={css.title}>
           {car.brand} <span>{car.model}</span>, {car.year}

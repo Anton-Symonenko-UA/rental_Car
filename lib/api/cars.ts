@@ -1,4 +1,9 @@
-import type { CarFilters, CarsResponse } from "@/types/car";
+import type {
+  Car,
+  CarFilters,
+  CarsResponse,
+  CarFilterOptions,
+} from "@/types/car";
 
 const BASE_URL = "https://car-rental-api.goit.study";
 
@@ -38,7 +43,7 @@ export async function getCars(
     params.set("maxMileage", String(maxMileage));
   }
 
-  const response = await fetch(`${BASE_URL}/cars`, {
+  const response = await fetch(`${BASE_URL}/cars?${params}`, {
     signal,
   });
   if (!response.ok) {
@@ -46,4 +51,32 @@ export async function getCars(
   }
   const data: CarsResponse = await response.json();
   return data;
+}
+
+export async function getCarFilterOptions(): Promise<CarFilterOptions> {
+  const response = await fetch(`${BASE_URL}/cars/filters`);
+
+  if (!response.ok) {
+    throw new Error(`Не вдалося завантажити фільтри: ${response.status}`);
+  }
+
+  const data: CarFilterOptions = await response.json();
+
+  return data;
+}
+
+export async function getCarById(carId: string): Promise<Car | null> {
+  const response = await fetch(`${BASE_URL}/cars/${encodeURIComponent(carId)}`);
+
+  if (response.status === 404) {
+    return null;
+  }
+
+  if (!response.ok) {
+    throw new Error(`Не вдалося завантажити автомобіль: ${response.status}`);
+  }
+
+  const car: Car = await response.json();
+
+  return car;
 }

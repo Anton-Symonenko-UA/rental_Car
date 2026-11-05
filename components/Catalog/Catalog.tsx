@@ -1,11 +1,19 @@
 "use client";
+
+import { useState } from "react";
 import css from "./Catalog.module.css";
 import { useCars } from "@/hooks/useCars";
 import type { CarFilters } from "@/types/car";
 import CarCard from "@/components/CarCard/CarCard";
+import CatalogFilters from "@/components/CatalogFilters/CatalogFilters";
 
-export default function Catalog() {
-  const filters: CarFilters = {};
+interface CatalogProps {
+  brands: string[];
+  prices: number[];
+}
+
+export default function Catalog({ brands, prices }: CatalogProps) {
+  const [filters, setFilters] = useState<CarFilters>({});
 
   const {
     data,
@@ -19,19 +27,21 @@ export default function Catalog() {
 
   const cars = data?.pages.flatMap((page) => page.cars) ?? [];
 
-  if (isPending) {
-    return <p>Завантаження автомобілів...</p>;
-  }
-
-  if (isError && !data) {
-    return <p role="alert">{error.message}</p>;
-  }
-
   return (
     <section className={css.catalog}>
       <h1 className={css.title}>Каталог автомобілів</h1>
 
-      {cars.length === 0 && (
+      <CatalogFilters brands={brands} prices={prices} onApply={setFilters} />
+
+      {isPending && <p className={css.message}>Завантаження автомобілів...</p>}
+
+      {isError && (
+        <p className={css.error} role="alert">
+          {error.message}
+        </p>
+      )}
+
+      {!isPending && !isError && cars.length === 0 && (
         <p className={css.message}>Автомобілів не знайдено.</p>
       )}
 
@@ -42,12 +52,6 @@ export default function Catalog() {
           </li>
         ))}
       </ul>
-
-      {isError && data && (
-        <p className={css.error} role="alert">
-          Не вдалося оновити список: {error.message}
-        </p>
-      )}
 
       {hasNextPage && (
         <button

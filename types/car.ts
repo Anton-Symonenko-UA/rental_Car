@@ -39,3 +39,11 @@ export interface CarsResponse {
   page: number;
   perPage: number;
 }
+
+export interface CarFilterOptions {
+  brands: string[];
+  price: {
+    min: number;
+    max: number;
+  };
+}
