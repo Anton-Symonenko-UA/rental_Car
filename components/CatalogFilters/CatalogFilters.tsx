@@ -78,7 +78,7 @@ export default function CatalogFilters({
           value={price}
           onChange={(event) => setPrice(event.target.value)}
         >
-          <option value="">Any price</option>
+          <option value="">Choose a price</option>
 
           {prices.map((item) => (
             <option key={item} value={item}>

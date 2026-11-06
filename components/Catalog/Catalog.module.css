@@ -2,23 +2,37 @@
     width: 100%;
     max-width: 1248px;
     margin: 0 auto;
-    padding: 64px 24px;
+    padding: 84px 24px 124px;
 }
 
-.title {
-    margin-bottom: 32px;
-    font-size: 32px;
-    font-weight: 700;
-    line-height: 1.25;
+.visuallyHidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+    border: 0;
+}
+
+.filters {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 56px;
+}
+
+/* Відступ між фільтрами та картками задає обгортка. */
+.filters>form {
+    margin-bottom: 0;
 }
 
 .list {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 32px;
-    margin: 0;
-    padding: 0;
-    list-style: none;
+    column-gap: 32px;
+    row-gap: 48px;
 }
 
 .item {
@@ -26,7 +40,8 @@
 }
 
 .message {
-    padding: 24px 0;
+    padding: 48px 0;
+    color: #667085;
     text-align: center;
 }
 
@@ -37,57 +52,59 @@
 }
 
 .loadMore {
-    display: block;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     min-width: 156px;
     min-height: 44px;
-    margin: 64px auto 0;
+    margin: 80px auto 0;
     padding: 12px 24px;
-
     border: 1px solid var(--color-primary);
     border-radius: 12px;
     background-color: transparent;
     color: var(--color-text);
-
     font-size: 16px;
     font-weight: 600;
     line-height: 20px;
-
-    transition:
-        background-color 200ms ease,
-        color 200ms ease;
+    transition: border-color 200ms ease;
 }
 
 .loadMore:hover:not(:disabled) {
-    background-color: var(--color-primary);
-    color: var(--color-white);
+    border-color: var(--color-primary-hover);
 }
 
 .loadMore:disabled {
     opacity: 0.6;
-    cursor: not-allowed;
 }
 
 @media (max-width: 1023px) {
+    .catalog {
+        padding-top: 48px;
+        padding-bottom: 80px;
+    }
+
     .list {
         grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 24px;
+        gap: 40px 24px;
     }
 }
 
 @media (max-width: 599px) {
     .catalog {
-        padding: 40px 16px;
+        padding: 32px 16px 64px;
     }
 
-    .title {
-        font-size: 28px;
+    .filters {
+        display: block;
+        margin-bottom: 32px;
     }
 
     .list {
         grid-template-columns: 1fr;
+        row-gap: 40px;
     }
 
     .loadMore {
-        margin-top: 40px;
+        margin-top: 48px;
     }
 }

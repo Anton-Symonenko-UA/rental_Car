@@ -6,10 +6,12 @@
 }
 
 .image {
+    display: block;
     width: 100%;
     height: 268px;
     margin-bottom: 16px;
     border-radius: 14px;
+    background-color: #f2f4f7;
     object-fit: cover;
 }
 
@@ -17,19 +19,22 @@
     display: flex;
     align-items: baseline;
     justify-content: space-between;
-    gap: 12px;
+    gap: 8px;
     margin-bottom: 8px;
 }
 
 .title,
 .price {
     font-size: 16px;
-    font-weight: 600;
-    line-height: 1.5;
+    font-weight: 500;
+    line-height: 24px;
 }
 
 .title {
     min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .title span {
@@ -42,36 +47,63 @@
 
 .details {
     display: flex;
-    flex-wrap: wrap;
-    gap: 4px 0;
-    margin-bottom: 24px;
-    color: #667085;
+    flex-direction: column;
+    gap: 4px;
+    margin-bottom: 28px;
+    color: #8d929a;
     font-size: 12px;
-    line-height: 1.5;
+    line-height: 16px;
 }
 
-.details li:not(:last-child) {
-    margin-right: 6px;
-    padding-right: 6px;
-    border-right: 1px solid #dadde1;
+.detailsRow {
+    display: flex;
+    align-items: center;
+    min-width: 0;
+}
+
+.detailsRow li {
+    min-width: 0;
+}
+
+.detailsRow li+li {
+    margin-left: 6px;
+    padding-left: 6px;
+    border-left: 1px solid #dadde1;
+}
+
+.detailsRow li:not(.company):not(.type) {
+    flex-shrink: 0;
+}
+
+.company,
+.type {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.type {
+    text-transform: capitalize;
+}
+
+.mileage {
+    white-space: nowrap;
 }
 
 .link {
     display: flex;
     align-items: center;
     justify-content: center;
+    width: 100%;
     min-height: 44px;
     margin-top: auto;
     padding: 12px 20px;
     border-radius: 12px;
-
     background-color: var(--color-primary);
     color: var(--color-white);
-
     font-size: 16px;
     font-weight: 600;
     line-height: 20px;
-
     transition: background-color 200ms ease;
 }
 

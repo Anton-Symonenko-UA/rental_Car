@@ -1,12 +1,22 @@
 import type { Car } from "@/types/car";
-import css from "./CarDetails.module.css";
 import RentalForm from "@/components/RentalForm/RentalForm";
+import css from "./CarDetails.module.css";
+import Icon from "@/components/Icons/Icons";
 
 interface CarDetailsProps {
   car: Car;
 }
 
 export default function CarDetails({ car }: CarDetailsProps) {
+  const mileage = car.mileage.toLocaleString("en-US").replaceAll(",", " ");
+
+  const specifications = [
+    { label: "Year", value: car.year },
+    { label: "Type", value: car.type },
+    { label: "Fuel Consumption", value: `${car.fuelConsumption} l/100 km` },
+    { label: "Engine Size", value: car.engine },
+  ];
+
   return (
     <main className={css.page}>
       <div className={css.layout}>
@@ -14,7 +24,7 @@ export default function CarDetails({ car }: CarDetailsProps) {
           <img
             className={css.image}
             src={car.img}
-            alt={`${car.brand} ${car.model}`}
+            alt={`${car.brand} ${car.model}, ${car.year}`}
             width={640}
             height={480}
           />
@@ -23,49 +33,68 @@ export default function CarDetails({ car }: CarDetailsProps) {
         </div>
 
         <div className={css.content}>
-          <h1 className={css.title}>
-            {car.brand} {car.model}, {car.year}
-          </h1>
+          <div className={css.summary}>
+            <div className={css.heading}>
+              <h1 className={css.title}>
+                {car.brand} {car.model}, {car.year}
+              </h1>
 
-          <p className={css.location}>
-            {car.location.city}, {car.location.country}
-          </p>
+              <span className={css.stockNumber}>Id: {car.stockNumber}</span>
+            </div>
 
-          <p className={css.mileage}>
-            Пробіг: {car.mileage.toLocaleString("en-US")} km
-          </p>
+            <div className={css.meta}>
+              <p className={css.location}>
+                <Icon name="location" className={css.icon} />
+                {car.location.city}, {car.location.country}
+              </p>
 
-          <p className={css.price}>${car.rentalPrice}</p>
+              <p>Mileage: {mileage} km</p>
+            </div>
 
-          <p className={css.description}>{car.description}</p>
+            <p className={css.price}>${car.rentalPrice}</p>
 
-          <section className={css.section}>
-            <h2 className={css.sectionTitle}>Характеристики</h2>
-
-            <ul className={css.list}>
-              <li>Тип: {car.type}</li>
-              <li>Двигун: {car.engine}</li>
-              <li>Витрата пального: {car.fuelConsumption} л/100 км</li>
-              <li>Компанія: {car.rentalCompany}</li>
-            </ul>
-          </section>
+            <p className={css.description}>{car.description}</p>
+          </div>
 
           <section className={css.section}>
-            <h2 className={css.sectionTitle}>Умови оренди</h2>
+            <h2 className={css.sectionTitle}>Rental Conditions:</h2>
 
             <ul className={css.list}>
               {car.rentalConditions.map((condition) => (
-                <li key={condition}>{condition}</li>
+                <li key={condition} className={css.listItem}>
+                  <Icon name="check-circle" className={css.icon} />
+                  <span>{condition}</span>
+                </li>
               ))}
             </ul>
           </section>
 
           <section className={css.section}>
-            <h2 className={css.sectionTitle}>Оснащення</h2>
+            <h2 className={css.sectionTitle}>Car Specifications:</h2>
+
+            <ul className={css.list}>
+              {specifications.map(({ label, value }) => (
+                <li key={label} className={css.listItem}>
+                  <Icon name="check-circle" className={css.icon} />
+                  <span>
+                    {label}: {value}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </section>
+
+          <section className={css.section}>
+            <h2 className={css.sectionTitle}>
+              Accessories and functionalities:
+            </h2>
 
             <ul className={css.list}>
               {car.features.map((feature) => (
-                <li key={feature}>{feature}</li>
+                <li key={feature} className={css.listItem}>
+                  <Icon name="check-circle" className={css.icon} />
+                  <span>{feature}</span>
+                </li>
               ))}
             </ul>
           </section>

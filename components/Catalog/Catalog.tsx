@@ -28,12 +28,18 @@ export default function Catalog({ brands, prices }: CatalogProps) {
   const cars = data?.pages.flatMap((page) => page.cars) ?? [];
 
   return (
-    <section className={css.catalog}>
-      <h1 className={css.title}>Каталог автомобілів</h1>
+    <main className={css.catalog}>
+      <h1 className={css.visuallyHidden}>Car catalog</h1>
 
-      <CatalogFilters brands={brands} prices={prices} onApply={setFilters} />
+      <div className={css.filters}>
+        <CatalogFilters brands={brands} prices={prices} onApply={setFilters} />
+      </div>
 
-      {isPending && <p className={css.message}>Завантаження автомобілів...</p>}
+      {isPending && (
+        <p className={css.message} role="status">
+          Loading cars...
+        </p>
+      )}
 
       {isError && (
         <p className={css.error} role="alert">
@@ -42,10 +48,10 @@ export default function Catalog({ brands, prices }: CatalogProps) {
       )}
 
       {!isPending && !isError && cars.length === 0 && (
-        <p className={css.message}>Автомобілів не знайдено.</p>
+        <p className={css.message}>No cars found. Try changing your filters.</p>
       )}
 
-      <ul className={css.list}>
+      <ul className={css.list} aria-label="Available cars">
         {cars.map((car) => (
           <li key={car.id} className={css.item}>
             <CarCard car={car} />
@@ -60,9 +66,9 @@ export default function Catalog({ brands, prices }: CatalogProps) {
           onClick={() => void fetchNextPage()}
           disabled={isFetchingNextPage}
         >
-          {isFetchingNextPage ? "Завантаження..." : "Load More"}
+          {isFetchingNextPage ? "Loading..." : "Load More"}
         </button>
       )}
-    </section>
+    </main>
   );
 }

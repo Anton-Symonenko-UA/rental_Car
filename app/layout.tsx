@@ -1,7 +1,8 @@
-import type { ReactNode } from "react";
+import { Suspense, type ReactNode } from "react";
 import { Manrope } from "next/font/google";
 import "./globals.css";
 import Providers from "./providers";
+import Header from "@/components/Header/Header";
 
 const manrope = Manrope({
   subsets: ["latin"],
@@ -14,7 +15,20 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
       <body className={manrope.variable}>
-        <Providers>{children}</Providers>
+        <Providers>
+          <Suspense
+            fallback={
+              <div
+                aria-hidden="true"
+                style={{ height: 68, backgroundColor: "#f2f4f7" }}
+              />
+            }
+          >
+            <Header />
+          </Suspense>
+
+          {children}
+        </Providers>
       </body>
     </html>
   );
