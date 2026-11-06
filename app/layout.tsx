@@ -20,7 +20,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             fallback={
               <div
                 aria-hidden="true"
-                style={{ height: 68, backgroundColor: "#f2f4f7" }}
+                style={{ height: 68, backgroundColor: "#ffffff" }}
               />
             }
           >

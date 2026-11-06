@@ -3,6 +3,7 @@
 import { useId, useRef, useState, type SubmitEvent } from "react";
 import { createBookingRequest } from "@/lib/api/rentals";
 import css from "./RentalForm.module.css";
+import Icon from "@/components/Icons/Icons";
 
 interface RentalFormProps {
   carId: string;
@@ -82,6 +83,8 @@ export default function RentalForm({ carId }: RentalFormProps) {
       nextErrors.name = "Please enter your name.";
     } else if (name.length > 100) {
       nextErrors.name = "Use no more than 100 characters.";
+    } else if (!/^\p{L}[\p{L}\p{M}]*(?:[ '\u2019\u02bc-]\p{L}[\p{L}\p{M}]*)*$/u.test(name)) {
+      nextErrors.name = "Use letters, spaces, hyphens or apostrophes. Numbers are not allowed.";
     }
 
     if (!email) {
@@ -167,24 +170,27 @@ export default function RentalForm({ carId }: RentalFormProps) {
 
           return (
             <div key={field.name} className={css.field}>
-              <label className={css.visuallyHidden} htmlFor={inputId}>
-                {field.label} (required)
+              <label className={error ? css.errorLabel : css.visuallyHidden} htmlFor={inputId}>
+                {field.label}*
               </label>
 
-              <input
-                id={inputId}
-                className={css.input}
-                name={field.name}
-                type={field.type}
-                placeholder={`${field.label}*`}
-                autoComplete={field.autoComplete}
-                maxLength={field.name === "name" ? 100 : undefined}
-                min={field.type === "date" ? getToday() : undefined}
-                aria-invalid={Boolean(error)}
-                aria-describedby={error ? `${inputId}-error` : undefined}
-                onChange={() => clearFeedback(field.name)}
-                required
-              />
+              <div className={css.inputWrap}>
+                <input
+                  id={inputId}
+                  className={css.input}
+                  name={field.name}
+                  type={field.type}
+                  placeholder={`${field.label}*`}
+                  autoComplete={field.autoComplete}
+                  maxLength={field.name === "name" ? 100 : undefined}
+                  min={field.type === "date" ? getToday() : undefined}
+                  aria-invalid={Boolean(error)}
+                  aria-describedby={error ? `${inputId}-error` : undefined}
+                  onChange={() => clearFeedback(field.name)}
+                  required
+                />
+                {error && <Icon name="error" size={24} className={css.errorIcon} />}
+              </div>
 
               {error && (
                 <p id={`${inputId}-error`} className={css.fieldError}>
@@ -200,19 +206,22 @@ export default function RentalForm({ carId }: RentalFormProps) {
             Comment
           </label>
 
-          <textarea
-            id={`${formId}-comment`}
-            className={css.textarea}
-            name="comment"
-            placeholder="Comment"
-            rows={3}
-            maxLength={1000}
-            aria-invalid={Boolean(errors.comment)}
-            aria-describedby={
-              errors.comment ? `${formId}-comment-error` : undefined
-            }
-            onChange={() => clearFeedback("comment")}
-          />
+          <div className={css.inputWrap}>
+            <textarea
+              id={`${formId}-comment`}
+              className={css.textarea}
+              name="comment"
+              placeholder="Comment"
+              rows={3}
+              maxLength={1000}
+              aria-invalid={Boolean(errors.comment)}
+              aria-describedby={
+                errors.comment ? `${formId}-comment-error` : undefined
+              }
+              onChange={() => clearFeedback("comment")}
+            />
+            {errors.comment && <Icon name="error" size={24} className={css.errorIcon} />}
+          </div>
 
           {errors.comment && (
             <p id={`${formId}-comment-error`} className={css.fieldError}>

@@ -15,7 +15,7 @@ export default function CarCard({ car }: CarCardProps) {
         className={css.image}
         src={car.img}
         alt={`${car.brand} ${car.model}, ${car.year}`}
-        width={276}
+        width={244}
         height={268}
         loading="lazy"
       />

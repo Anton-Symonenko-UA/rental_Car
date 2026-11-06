@@ -1,5 +1,5 @@
 interface IconProps {
-  name: "check-circle" | "location";
+  name: "check-circle" | "location" | "calendar" | "car" | "fuel" | "gear" | "road" | "chevron" | "error";
   size?: number;
   className?: string;
 }

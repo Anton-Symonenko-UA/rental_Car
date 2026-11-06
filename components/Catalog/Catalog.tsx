@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import css from "./Catalog.module.css";
 import { useCars } from "@/hooks/useCars";
 import type { CarFilters } from "@/types/car";
@@ -14,6 +15,12 @@ interface CatalogProps {
 
 export default function Catalog({ brands, prices }: CatalogProps) {
   const [filters, setFilters] = useState<CarFilters>({});
+  const [filterVersion, setFilterVersion] = useState(0);
+
+  function resetFilters() {
+    setFilters({});
+    setFilterVersion((version) => version + 1);
+  }
 
   const {
     data,
@@ -35,13 +42,29 @@ export default function Catalog({ brands, prices }: CatalogProps) {
       <h1 className={css.visuallyHidden}>Car catalog</h1>
 
       <div className={css.filters}>
-        <CatalogFilters brands={brands} prices={prices} onApply={setFilters} />
+        <CatalogFilters key={filterVersion} brands={brands} prices={prices} onApply={setFilters} />
       </div>
 
       {isPending && (
-        <p className={css.message} role="status">
-          Loading cars...
-        </p>
+        <>
+          <div className={css.list} aria-hidden="true">
+            {Array.from({ length: 12 }, (_, index) => (
+              <div key={index} className={css.placeholderCard}>
+                <div className={css.placeholderImage} />
+                <div className={css.placeholderLine} />
+                <div className={css.placeholderDetails} />
+                <div className={css.placeholderButton} />
+              </div>
+            ))}
+          </div>
+          <div className={css.loadingOverlay}>
+            <div className={css.loadingPanel} role="status">
+              <Image src="/images/spinner.svg" width={72} height={72} className={css.spinner} alt="" />
+              <h2>Loading cars...</h2>
+              <p>Please wait while we fetch the best cars for you.</p>
+            </div>
+          </div>
+        </>
       )}
 
       {showInitialError && (
@@ -62,7 +85,19 @@ export default function Catalog({ brands, prices }: CatalogProps) {
       )}
 
       {!isPending && !isError && cars.length === 0 && (
-        <p className={css.message}>No cars found. Try changing your filters.</p>
+        <div className={css.empty}>
+          <div className={css.emptyImage}>
+            <Image src="/images/no-cars.png" alt="" fill sizes="414px" />
+          </div>
+          <h2>No cars found</h2>
+          <p>
+            We couldn’t find any cars that match your current filters.
+            Try changing your search criteria or reset the filters.
+          </p>
+          <button className={css.resetFilters} type="button" onClick={resetFilters}>
+            Reset filters
+          </button>
+        </div>
       )}
 
       <ul className={css.list} aria-label="Available cars">
@@ -90,7 +125,7 @@ export default function Catalog({ brands, prices }: CatalogProps) {
             ? "Loading..."
             : isFetchNextPageError
               ? "Try again"
-              : "Load More"}
+              : "Load more"}
         </button>
       )}
     </main>

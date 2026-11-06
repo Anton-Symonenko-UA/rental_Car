@@ -1,6 +1,8 @@
 .hero {
+    position: relative;
+    isolation: isolate;
     box-sizing: border-box;
-    min-height: 696px;
+    min-height: calc(100svh - var(--header-height));
     padding: 60px 24px;
 
     display: flex;
@@ -8,16 +10,24 @@
     align-items: center;
     justify-content: flex-end;
 
-    background-image:
-        linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.2)),
-        url("/images/hero-background.webp");
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-
     font-family: var(--font-manrope), sans-serif;
     color: #fff;
     text-align: center;
+}
+
+.background {
+    z-index: -2;
+    object-fit: cover;
+    object-position: center;
+}
+
+.hero::before {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background-color: rgb(0 0 0 / 20%);
+    content: "";
+    pointer-events: none;
 }
 
 .hero h1 {
@@ -45,7 +55,7 @@
     padding: 12px 24px;
     border-radius: 12px;
 
-    background-color: #00aad4;
+    background-color: var(--color-primary);
     color: #fff;
 
     font-size: 16px;
@@ -57,7 +67,7 @@
 }
 
 .button:hover {
-    background-color: #008aaa;
+    background-color: var(--color-primary-hover);
 }
 
 .button:focus-visible {
@@ -68,7 +78,7 @@
 
 @media (max-width: 767px) {
     .hero {
-        min-height: 600px;
+        min-height: calc(100svh - var(--header-height));
         padding: 48px 20px;
     }
 

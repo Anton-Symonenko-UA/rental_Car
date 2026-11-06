@@ -1,189 +1,237 @@
 .form {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: flex-end;
-    justify-content: center;
-    gap: 16px;
-    width: 100%;
+  display: grid;
+  grid-template-columns: 204px 196px 320px 156px;
+  align-items: start;
+  gap: 16px;
+  width: 924px;
+  max-width: 100%;
+  min-height: 96px;
 }
 
 .field {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    min-width: 0;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
 }
 
 .label,
 .legend {
-    color: #8d929a;
-    font-size: 12px;
-    font-weight: 400;
-    line-height: 16px;
+  color: #8d929a;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 16px;
 }
 
 .select {
-    width: 204px;
-    height: 48px;
-    padding: 12px 16px;
-    border: 1px solid transparent;
-    border-radius: 12px;
-    background-color: #f7f7f7;
-    color: var(--color-text);
-    font-size: 16px;
-    font-weight: 500;
-    line-height: 20px;
-    cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  height: 44px;
+  padding: 12px 16px;
+  border: 0;
+  border-radius: 12px;
+  background-color: var(--color-white);
+  color: var(--color-text);
+  text-align: left;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 20px;
 }
 
-.field:nth-child(2) .select {
-    width: 196px;
+.select > span {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.chevron,
+.chevronOpen {
+  flex-shrink: 0;
+  transition: transform 200ms ease;
+}
+
+.chevronOpen {
+  transform: rotate(180deg);
+}
+
+.options {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  z-index: 10;
+  width: 100%;
+  max-height: 272px;
+  overflow-y: auto;
+  padding: 12px 8px 12px 18px;
+  border-radius: 12px;
+  background-color: var(--color-white);
+  scrollbar-width: thin;
+  scrollbar-color: #dadde1 transparent;
+}
+
+.field:nth-child(2) .options {
+  max-height: 192px;
+}
+
+.option {
+  padding: 4px 0;
+  color: #8d929a;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 20px;
+  cursor: pointer;
+}
+
+.option[aria-selected="true"],
+.highlighted,
+.option:hover {
+  color: var(--color-text);
 }
 
 .mileage {
-    min-width: 0;
-    margin: 0;
-    padding: 0;
-    border: 0;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
 }
 
 .legend {
-    margin-bottom: 8px;
-    padding: 0;
+  margin-bottom: 8px;
+  padding: 0;
 }
 
 .range {
-    display: flex;
+  display: flex;
 }
 
 .rangeField {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    width: 160px;
-    height: 48px;
-    padding: 12px 16px;
-    background-color: #f7f7f7;
-    color: var(--color-text);
-    font-size: 16px;
-    font-weight: 500;
-    line-height: 20px;
-    cursor: text;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 50%;
+  height: 44px;
+  padding: 12px 24px;
+  background-color: var(--color-white);
+  color: var(--color-text);
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 20px;
+  cursor: text;
 }
 
 .rangeField:first-child {
-    border-right: 1px solid #dadde1;
-    border-radius: 12px 0 0 12px;
+  border-right: 1px solid #dadde1;
+  border-radius: 12px 0 0 12px;
 }
 
 .rangeField:last-child {
-    border-radius: 0 12px 12px 0;
+  border-radius: 0 12px 12px 0;
 }
 
 .rangeField:focus-within {
-    outline: 2px solid var(--color-primary);
-    outline-offset: 2px;
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
 }
 
 .input {
-    width: 100%;
-    min-width: 0;
-    padding: 0;
-    border: 0;
-    border-radius: 0;
-    background-color: transparent;
-    color: inherit;
-    font: inherit;
-    appearance: textfield;
+  width: 100%;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background-color: transparent;
+  color: inherit;
+  font: inherit;
+  appearance: textfield;
 }
 
 .input::-webkit-inner-spin-button,
 .input::-webkit-outer-spin-button {
-    margin: 0;
-    appearance: none;
+  margin: 0;
+  appearance: none;
 }
 
 .input:focus-visible {
-    outline: none;
-}
-
-.select:focus-visible {
-    outline: 2px solid var(--color-primary);
-    outline-offset: 2px;
+  outline: none;
 }
 
 .actions {
-    display: flex;
-    gap: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-top: 24px;
 }
 
 .button {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-width: 156px;
-    height: 48px;
-    padding: 12px 24px;
-    border: 1px solid var(--color-primary);
-    border-radius: 12px;
-    font-size: 16px;
-    font-weight: 600;
-    line-height: 20px;
-    transition:
-        background-color 200ms ease,
-        border-color 200ms ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 156px;
+  height: 44px;
+  padding: 12px 24px;
+  border: 0;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 20px;
+  transition: background-color 200ms ease;
 }
 
 .search {
-    background-color: var(--color-primary);
-    color: var(--color-white);
+  background-color: var(--color-primary);
+  color: var(--color-white);
 }
 
 .search:hover {
-    border-color: var(--color-primary-hover);
-    background-color: var(--color-primary-hover);
+  background-color: var(--color-primary-hover);
 }
 
 .reset {
-    min-width: 100px;
-    background-color: transparent;
-    color: var(--color-text);
+  padding: 0;
+  border: 0;
+  background-color: transparent;
+  color: #8d929a;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 20px;
 }
 
 .reset:hover {
-    border-color: var(--color-primary-hover);
-    background-color: #f7f7f7;
+  color: var(--color-text);
 }
 
 .error {
-    flex-basis: 100%;
-    color: #b42318;
-    font-size: 14px;
-    text-align: center;
+  grid-column: 1 / -1;
+  color: #ec383b;
+  font-size: 14px;
+  text-align: center;
+}
+
+@media (max-width: 1023px) {
+  .form {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    width: 100%;
+  }
 }
 
 @media (max-width: 599px) {
-    .form {
-        flex-direction: column;
-        align-items: stretch;
-    }
+  .form {
+    grid-template-columns: minmax(0, 1fr);
+  }
 
-    .select,
-    .field:nth-child(2) .select {
-        width: 100%;
-    }
+  .actions {
+    padding-top: 0;
+  }
 
-    .rangeField {
-        width: 50%;
-    }
+  .button {
+    width: 100%;
+  }
 
-    .button {
-        flex: 1;
-        min-width: 0;
-    }
-
-    .error {
-        flex-basis: auto;
-        text-align: left;
-    }
+  .error {
+    text-align: left;
+  }
 }

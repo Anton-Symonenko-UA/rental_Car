@@ -11,11 +11,12 @@ export default function CarDetails({ car }: CarDetailsProps) {
   const mileage = car.mileage.toLocaleString("en-US").replaceAll(",", " ");
 
   const specifications = [
-    { label: "Year", value: car.year },
-    { label: "Type", value: car.type },
-    { label: "Fuel Consumption", value: `${car.fuelConsumption} l/100 km` },
-    { label: "Engine Size", value: car.engine },
-  ];
+    { label: "Year", value: car.year, icon: "calendar" },
+    { label: "Type", value: car.type, icon: "car" },
+    { label: "Fuel Consumption", value: `${car.fuelConsumption} l/100 km`, icon: "fuel" },
+    { label: "Engine", value: car.engine, icon: "gear" },
+    { label: "Mileage", value: `${mileage} km`, icon: "road" },
+  ] as const;
 
   return (
     <main className={css.page}>
@@ -26,7 +27,7 @@ export default function CarDetails({ car }: CarDetailsProps) {
             src={car.img}
             alt={`${car.brand} ${car.model}, ${car.year}`}
             width={640}
-            height={480}
+            height={512}
           />
 
           <RentalForm carId={car.id} />
@@ -39,7 +40,7 @@ export default function CarDetails({ car }: CarDetailsProps) {
                 {car.brand} {car.model}, {car.year}
               </h1>
 
-              <span className={css.stockNumber}>Id: {car.stockNumber}</span>
+              <span className={css.stockNumber}>Article: {car.stockNumber}</span>
             </div>
 
             <div className={css.meta}>
@@ -47,8 +48,6 @@ export default function CarDetails({ car }: CarDetailsProps) {
                 <Icon name="location" className={css.icon} />
                 {car.location.city}, {car.location.country}
               </p>
-
-              <p>Mileage: {mileage} km</p>
             </div>
 
             <p className={css.price}>${car.rentalPrice}</p>
@@ -73,9 +72,9 @@ export default function CarDetails({ car }: CarDetailsProps) {
             <h2 className={css.sectionTitle}>Car Specifications:</h2>
 
             <ul className={css.list}>
-              {specifications.map(({ label, value }) => (
+              {specifications.map(({ label, value, icon }) => (
                 <li key={label} className={css.listItem}>
-                  <Icon name="check-circle" className={css.icon} />
+                  <Icon name={icon} className={css.icon} />
                   <span>
                     {label}: {value}
                   </span>
@@ -85,9 +84,7 @@ export default function CarDetails({ car }: CarDetailsProps) {
           </section>
 
           <section className={css.section}>
-            <h2 className={css.sectionTitle}>
-              Accessories and functionalities:
-            </h2>
+            <h2 className={css.sectionTitle}>Features</h2>
 
             <ul className={css.list}>
               {car.features.map((feature) => (

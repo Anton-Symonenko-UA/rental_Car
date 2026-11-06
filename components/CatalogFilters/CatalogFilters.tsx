@@ -2,6 +2,7 @@
 import css from "./CatalogFilters.module.css";
 import { useState, type SubmitEvent } from "react";
 import type { CarFilters } from "@/types/car";
+import FilterSelect from "./FilterSelect";
 
 interface CatalogFiltersProps {
   brands: string[];
@@ -52,41 +53,21 @@ export default function CatalogFilters({
 
   return (
     <form className={css.form} onSubmit={handleSubmit}>
-      <label className={css.field}>
-        <span className={css.label}>Car brand</span>
-
-        <select
-          className={css.select}
-          value={brand}
-          onChange={(event) => setBrand(event.target.value)}
-        >
-          <option value="">All brands</option>
-
-          {brands.map((item) => (
-            <option key={item} value={item}>
-              {item}
-            </option>
-          ))}
-        </select>
-      </label>
-
-      <label className={css.field}>
-        <span className={css.label}>Price / 1 hour</span>
-
-        <select
-          className={css.select}
-          value={price}
-          onChange={(event) => setPrice(event.target.value)}
-        >
-          <option value="">Choose a price</option>
-
-          {prices.map((item) => (
-            <option key={item} value={item}>
-              ${item}
-            </option>
-          ))}
-        </select>
-      </label>
+      <FilterSelect
+        label="Car brand"
+        placeholder="Choose a brand"
+        value={brand}
+        options={brands.map((item) => ({ value: item, label: item }))}
+        onChange={setBrand}
+      />
+      <FilterSelect
+        label="Price / 1 hour"
+        placeholder="Choose a price"
+        value={price}
+        displayValue={`To $${price}`}
+        options={prices.map((item) => ({ value: String(item), label: String(item) }))}
+        onChange={setPrice}
+      />
 
       <fieldset className={css.mileage}>
         <legend className={css.legend}>Car mileage / km</legend>
@@ -126,11 +107,11 @@ export default function CatalogFilters({
         </button>
 
         <button
-          className={`${css.button} ${css.reset}`}
+          className={css.reset}
           type="button"
           onClick={handleReset}
         >
-          Reset
+          Clear filters
         </button>
       </div>
 

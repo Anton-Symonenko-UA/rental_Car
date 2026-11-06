@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import css from "./Header.module.css";
 
@@ -12,7 +13,7 @@ export default function Header() {
     <header className={css.header}>
       <div className={css.container}>
         <Link href="/" className={css.logo} aria-label="RentalCar home">
-          Rental<span className={css.logoAccent}>Car</span>
+          <Image src="/images/logo.svg" alt="RentalCar" width={101.071} height={16} />
         </Link>
 
         <nav aria-label="Main navigation">

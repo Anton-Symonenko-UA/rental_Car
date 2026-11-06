@@ -1,7 +1,7 @@
 .header {
     width: 100%;
     border-bottom: 1px solid #f2f4f7;
-    background-color: #f2f4f7;
+    background-color: #FFFFFF;
 }
 
 .container {
@@ -10,7 +10,7 @@
     justify-content: space-between;
     width: 100%;
     max-width: 1248px;
-    min-height: 68px;
+    min-height: calc(var(--header-height) - 1px);
     margin: 0 auto;
     padding: 0 24px;
 }
@@ -24,10 +24,6 @@
     font-weight: 700;
     line-height: 1;
     letter-spacing: -0.04em;
-}
-
-.logoAccent {
-    color: var(--color-primary);
 }
 
 .navList {
@@ -50,6 +46,8 @@
 .navLink:hover,
 .active {
     color: var(--color-primary);
+    text-decoration: underline;
+    text-underline-offset: 3px;
 }
 
 @media (max-width: 599px) {
