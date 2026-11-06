@@ -23,7 +23,7 @@
     margin-bottom: 56px;
 }
 
-/* Відступ між фільтрами та картками задає обгортка. */
+
 .filters>form {
     margin-bottom: 0;
 }
@@ -75,6 +75,55 @@
 
 .loadMore:disabled {
     opacity: 0.6;
+}
+.feedback {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    padding: 48px 0;
+    text-align: center;
+}
+
+.feedback .error {
+    margin: 0;
+}
+
+.retry {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 156px;
+    min-height: 44px;
+    padding: 12px 24px;
+    border: 0;
+    border-radius: 12px;
+    background-color: var(--color-primary);
+    color: var(--color-white);
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 20px;
+    transition: background-color 200ms ease;
+}
+
+.retry:hover:not(:disabled) {
+    background-color: var(--color-primary-hover);
+}
+
+.retry:disabled {
+    opacity: 0.6;
+}
+
+.paginationError {
+    margin-top: 32px;
+    color: #b42318;
+    font-size: 14px;
+    line-height: 20px;
+    text-align: center;
+}
+
+.paginationError+.loadMore {
+    margin-top: 20px;
 }
 
 @media (max-width: 1023px) {

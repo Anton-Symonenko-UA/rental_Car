@@ -1,30 +1,69 @@
 "use client";
 
-import { useState, type SubmitEvent } from "react";
-import css from "./RentalForm.module.css";
+import { useId, useRef, useState, type SubmitEvent } from "react";
 import { createBookingRequest } from "@/lib/api/rentals";
+import css from "./RentalForm.module.css";
 
 interface RentalFormProps {
   carId: string;
 }
 
-export default function RentalForm({ carId }: RentalFormProps) {
-  const [message, setMessage] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
+type FieldName = "name" | "email" | "bookingDate" | "comment";
+type FieldErrors = Partial<Record<FieldName, string>>;
 
+const fields = [
+  {
+    name: "name",
+    label: "Name",
+    type: "text",
+    autoComplete: "name",
+  },
+  {
+    name: "email",
+    label: "Email",
+    type: "email",
+    autoComplete: "email",
+  },
+  {
+    name: "bookingDate",
+    label: "Booking date",
+    type: "date",
+    autoComplete: "off",
+  },
+] as const;
+
+function getToday() {
   const today = new Date();
-  const minDate = [
+
+  return [
     today.getFullYear(),
     String(today.getMonth() + 1).padStart(2, "0"),
     String(today.getDate()).padStart(2, "0"),
   ].join("-");
+}
+
+export default function RentalForm({ carId }: RentalFormProps) {
+  const formId = useId();
+  const submittingRef = useRef(false);
+
+  const [errors, setErrors] = useState<FieldErrors>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [success, setSuccess] = useState("");
+  const [submitError, setSubmitError] = useState("");
+
+  function clearFeedback(field: FieldName) {
+    setErrors((previous) => ({
+      ...previous,
+      [field]: undefined,
+    }));
+    setSuccess("");
+    setSubmitError("");
+  }
 
   async function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    if (isSubmitting) {
-      return;
-    }
+    if (submittingRef.current) return;
 
     const form = event.currentTarget;
     const formData = new FormData(form);
@@ -34,18 +73,51 @@ export default function RentalForm({ carId }: RentalFormProps) {
     const bookingDate = String(formData.get("bookingDate") ?? "");
     const comment = String(formData.get("comment") ?? "").trim();
 
-    if (!name || !email || !bookingDate) {
-      setMessage("Заповніть усі обов’язкові поля.");
+    const nextErrors: FieldErrors = {};
+    const emailInput = form.querySelector<HTMLInputElement>(
+      'input[name="email"]',
+    );
+
+    if (!name) {
+      nextErrors.name = "Please enter your name.";
+    } else if (name.length > 100) {
+      nextErrors.name = "Use no more than 100 characters.";
+    }
+
+    if (!email) {
+      nextErrors.email = "Please enter your email.";
+    } else if (emailInput?.validity.typeMismatch) {
+      nextErrors.email = "Please enter a valid email address.";
+    }
+
+    if (!bookingDate) {
+      nextErrors.bookingDate = "Please choose a booking date.";
+    } else if (bookingDate < getToday()) {
+      nextErrors.bookingDate = "Choose today or a future date.";
+    }
+
+    if (comment.length > 1000) {
+      nextErrors.comment = "Use no more than 1,000 characters.";
+    }
+
+    setErrors(nextErrors);
+    setSuccess("");
+    setSubmitError("");
+
+    const firstInvalidField = Object.keys(nextErrors)[0];
+
+    if (firstInvalidField) {
+      form
+        .querySelector<
+          HTMLInputElement | HTMLTextAreaElement
+        >(`[name="${firstInvalidField}"]`)
+        ?.focus();
+
       return;
     }
 
-    if (bookingDate < minDate) {
-      setMessage("Оберіть сьогоднішню або майбутню дату.");
-      return;
-    }
-
+    submittingRef.current = true;
     setIsSubmitting(true);
-    setMessage("");
 
     try {
       await createBookingRequest(carId, {
@@ -57,81 +129,110 @@ export default function RentalForm({ carId }: RentalFormProps) {
       });
 
       form.reset();
-      setMessage("Заявку надіслано! Очікуйте підтвердження.");
-    } catch (error) {
-      setMessage(
-        error instanceof Error
-          ? error.message
-          : "Не вдалося надіслати заявку. Спробуйте ще раз.",
+      setSuccess(
+        "Your booking request has been sent! We will contact you to confirm the details.",
       );
+    } catch {
+      setSubmitError("Could not send your request. Please try again.");
     } finally {
+      submittingRef.current = false;
       setIsSubmitting(false);
     }
   }
 
   return (
-    <form className={css.form} onSubmit={handleSubmit}>
+    <form
+      className={css.form}
+      onSubmit={handleSubmit}
+      aria-labelledby={`${formId}-title`}
+      aria-busy={isSubmitting}
+      noValidate
+    >
       <div className={css.header}>
-        <h2 className={css.title}>Book your car now</h2>
+        <h2 id={`${formId}-title`} className={css.title}>
+          Book your car now
+        </h2>
 
         <p className={css.description}>
           Stay connected! We are always ready to help you.
         </p>
       </div>
 
-      <input type="hidden" name="carId" value={carId} />
+      <fieldset className={css.fields} disabled={isSubmitting}>
+        <legend className={css.visuallyHidden}>Booking details</legend>
 
-      <label className={css.field}>
-        Name*
-        <input
-          className={css.input}
-          type="text"
-          name="name"
-          autoComplete="name"
-          maxLength={100}
-          required
-        />
-      </label>
+        {fields.map((field) => {
+          const inputId = `${formId}-${field.name}`;
+          const error = errors[field.name];
 
-      <label className={css.field}>
-        Email*
-        <input
-          className={css.input}
-          type="email"
-          name="email"
-          autoComplete="email"
-          required
-        />
-      </label>
+          return (
+            <div key={field.name} className={css.field}>
+              <label className={css.visuallyHidden} htmlFor={inputId}>
+                {field.label} (required)
+              </label>
 
-      <label className={css.field}>
-        Booking date*
-        <input
-          className={css.input}
-          type="date"
-          name="bookingDate"
-          min={minDate}
-          required
-        />
-      </label>
+              <input
+                id={inputId}
+                className={css.input}
+                name={field.name}
+                type={field.type}
+                placeholder={`${field.label}*`}
+                autoComplete={field.autoComplete}
+                maxLength={field.name === "name" ? 100 : undefined}
+                min={field.type === "date" ? getToday() : undefined}
+                aria-invalid={Boolean(error)}
+                aria-describedby={error ? `${inputId}-error` : undefined}
+                onChange={() => clearFeedback(field.name)}
+                required
+              />
 
-      <label className={css.field}>
-        Comment
-        <textarea
-          className={css.textarea}
-          name="comment"
-          rows={4}
-          maxLength={1000}
-        />
-      </label>
+              {error && (
+                <p id={`${inputId}-error`} className={css.fieldError}>
+                  {error}
+                </p>
+              )}
+            </div>
+          );
+        })}
+
+        <div className={css.field}>
+          <label className={css.visuallyHidden} htmlFor={`${formId}-comment`}>
+            Comment
+          </label>
+
+          <textarea
+            id={`${formId}-comment`}
+            className={css.textarea}
+            name="comment"
+            placeholder="Comment"
+            rows={3}
+            maxLength={1000}
+            aria-invalid={Boolean(errors.comment)}
+            aria-describedby={
+              errors.comment ? `${formId}-comment-error` : undefined
+            }
+            onChange={() => clearFeedback("comment")}
+          />
+
+          {errors.comment && (
+            <p id={`${formId}-comment-error`} className={css.fieldError}>
+              {errors.comment}
+            </p>
+          )}
+        </div>
+      </fieldset>
 
       <button className={css.button} type="submit" disabled={isSubmitting}>
         {isSubmitting ? "Sending..." : "Send"}
       </button>
 
-      <p className={css.message} role="status">
-        {message}
-      </p>
+      <div role="status" aria-atomic="true">
+        {success && <p className={css.success}>{success}</p>}
+      </div>
+
+      <div role="alert" aria-atomic="true">
+        {submitError && <p className={css.submitError}>{submitError}</p>}
+      </div>
     </form>
   );
 }

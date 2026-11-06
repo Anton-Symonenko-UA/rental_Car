@@ -19,13 +19,16 @@ export default function Catalog({ brands, prices }: CatalogProps) {
     data,
     isPending,
     isError,
-    error,
+    isFetching,
+    isFetchNextPageError,
+    refetch,
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
   } = useCars(filters);
 
   const cars = data?.pages.flatMap((page) => page.cars) ?? [];
+  const showInitialError = isError && cars.length === 0;
 
   return (
     <main className={css.catalog}>
@@ -41,10 +44,21 @@ export default function Catalog({ brands, prices }: CatalogProps) {
         </p>
       )}
 
-      {isError && (
-        <p className={css.error} role="alert">
-          {error.message}
-        </p>
+      {showInitialError && (
+        <div className={css.feedback}>
+          <p className={css.error} role="alert">
+            Could not load cars. Please try again.
+          </p>
+
+          <button
+            className={css.retry}
+            type="button"
+            onClick={() => void refetch()}
+            disabled={isFetching}
+          >
+            {isFetching ? "Loading..." : "Try again"}
+          </button>
+        </div>
       )}
 
       {!isPending && !isError && cars.length === 0 && (
@@ -59,14 +73,24 @@ export default function Catalog({ brands, prices }: CatalogProps) {
         ))}
       </ul>
 
-      {hasNextPage && (
+      {isFetchNextPageError && cars.length > 0 && (
+        <p className={css.paginationError} role="alert">
+          Could not load more cars. Please try again.
+        </p>
+      )}
+
+      {hasNextPage && cars.length > 0 && (
         <button
           className={css.loadMore}
           type="button"
           onClick={() => void fetchNextPage()}
-          disabled={isFetchingNextPage}
+          disabled={isFetching}
         >
-          {isFetchingNextPage ? "Loading..." : "Load More"}
+          {isFetchingNextPage
+            ? "Loading..."
+            : isFetchNextPageError
+              ? "Try again"
+              : "Load More"}
         </button>
       )}
     </main>
