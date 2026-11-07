@@ -1,36 +1,100 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# RentalCar
 
-## Getting Started
+Застосунок для пошуку автомобілів та надсилання заявок на оренду. Побудований на Next.js App Router і TypeScript за макетом Figma.
 
-First, run the development server:
+## Можливості
+
+- Головна сторінка з hero-секцією та переходом до каталогу.
+- Каталог із серверною фільтрацією за брендом, ціною та пробігом «від» / «до».
+- Довантаження кнопкою **Load more** через `useInfiniteQuery` з урахуванням активних фільтрів.
+- Скидання фільтрів, стани завантаження, порожнього результату та помилок із повторною спробою.
+- Деталі автомобіля з фотографією, характеристиками, умовами оренди та оснащенням. **Read more** відкриває їх у новій вкладці.
+- Форма заявки з перевіркою імені, email та дати, захистом від повторного відправлення й повідомленням про результат.
+- SVG-спрайт і локальні графічні ресурси з макета.
+
+## Технології
+
+- Next.js 16, App Router, Cache Components
+- React 19, TypeScript
+- TanStack Query 5
+- CSS Modules
+- Шрифт Manrope через `next/font`
+
+## Локальний запуск
+
+Потрібні Node.js **20.9 або новіший** і npm. Для встановлення залежностей, завантаження Google Fonts під час збірки та роботи API потрібен інтернет.
 
 ```bash
+npm ci
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Відкрийте [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Для іншого порту:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run dev -- --port 3001
+```
 
-## Learn More
+Обов’язкових змінних середовища немає. Застосунок використовує публічний бекенд `https://car-rental-api.goit.study` без API-ключа.
 
-To learn more about Next.js, take a look at the following resources:
+## Перевірки та production-запуск
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+npm run lint
+npx tsc --noEmit --incremental false
+npm run build
+npm run start
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+`npm run start` запускає вже зібраний застосунок, тому спочатку потрібно виконати `npm run build`.
 
-## Deploy on Vercel
+## Маршрути
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+| Шлях | Сторінка |
+| --- | --- |
+| `/` | Головна |
+| `/catalog` | Каталог і фільтри |
+| `/catalog/[carId]` | Деталі автомобіля та форма заявки |
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## API
+
+[Документація Rental Car API](https://car-rental-api.goit.study/api-docs/)
+
+| Метод | Endpoint | Призначення |
+| --- | --- | --- |
+| GET | `/cars` | Автомобілі, фільтрація та пагінація |
+| GET | `/cars/filters` | Бренди й діапазон цін |
+| GET | `/cars/{id}` | Деталі автомобіля |
+| POST | `/cars/{carId}/booking-requests` | Надсилання заявки |
+
+Каталог отримує по 12 автомобілів за запит. Параметри `brand`, `price`, `minMileage` та `maxMileage` передаються бекенду; локальна фільтрація списку не використовується.
+
+Endpoint заявки приймає `name`, `email` та `comment`. Оскільки окремого поля дати в API немає, обрана дата додається до коментаря. Успішна відповідь означає прийняття заявки; деталі оренди потребують підтвердження.
+
+## Структура
+
+```text
+app/          Маршрути, layout, провайдер TanStack Query та стани сторінок
+components/   Header, Hero, каталог, фільтри, картки, деталі та форма
+hooks/        useCars із useInfiniteQuery
+lib/api/      HTTP-запити до бекенду
+types/       Типи автомобілів, фільтрів і відповідей API
+public/       Зображення, логотип і SVG-спрайт
+```
+
+## Макет
+
+[Rental Car у Figma](https://www.figma.com/design/0TVi7Z9HBVv5PYdkISQzLs/Rental-Car--Copy-?node-id=12791-565)
+
+Основний макет — десктопний. Додані медіазапити для вужчих екранів. Поле Booking date збережене як додаткова можливість форми; календар використовує стандартний інтерфейс браузера.
+
+## Деплой на Vercel
+
+1. Завантажте репозиторій на GitHub та імпортуйте його у Vercel.
+2. Оберіть framework preset **Next.js** і корінь цього проєкту.
+3. Використайте команду збірки `npm run build` та стандартні налаштування output directory для Next.js.
+4. Після деплою перевірте каталог, фільтри, довантаження, пряме відкриття деталей і надсилання заявки.
+
+Публічне посилання на розгорнутий застосунок потрібно додати до матеріалів здачі після деплою.

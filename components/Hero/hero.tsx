@@ -7,7 +7,7 @@ export default function Hero() {
     <section className={css.hero}>
       <Image
         className={css.background}
-        src="/images/hero-background.png"
+        src="/images/hero-background.webp"
         alt=""
         fill
         sizes="100vw"
