@@ -11,7 +11,8 @@ export default function Hero() {
         alt=""
         fill
         sizes="100vw"
-        preload
+        loading="eager"
+        fetchPriority="high"
       />
       <h1>Find your perfect rental car</h1>
       <p>Reliable and budget-friendly rentals for any journey</p>
