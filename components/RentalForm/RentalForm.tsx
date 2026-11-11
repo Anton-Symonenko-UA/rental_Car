@@ -1,6 +1,7 @@
 "use client";
 
 import { useId, useRef, useState, type SubmitEvent } from "react";
+import toast from "react-hot-toast";
 import { createBookingRequest } from "@/lib/api/rentals";
 import css from "./RentalForm.module.css";
 import Icon from "@/components/Icons/Icons";
@@ -9,7 +10,7 @@ interface RentalFormProps {
   carId: string;
 }
 
-type FieldName = "name" | "email" | "bookingDate" | "comment";
+type FieldName = "name" | "email" | "comment";
 type FieldErrors = Partial<Record<FieldName, string>>;
 
 const fields = [
@@ -25,23 +26,7 @@ const fields = [
     type: "email",
     autoComplete: "email",
   },
-  {
-    name: "bookingDate",
-    label: "Booking date",
-    type: "date",
-    autoComplete: "off",
-  },
 ] as const;
-
-function getToday() {
-  const today = new Date();
-
-  return [
-    today.getFullYear(),
-    String(today.getMonth() + 1).padStart(2, "0"),
-    String(today.getDate()).padStart(2, "0"),
-  ].join("-");
-}
 
 export default function RentalForm({ carId }: RentalFormProps) {
   const formId = useId();
@@ -49,16 +34,12 @@ export default function RentalForm({ carId }: RentalFormProps) {
 
   const [errors, setErrors] = useState<FieldErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [success, setSuccess] = useState("");
-  const [submitError, setSubmitError] = useState("");
 
-  function clearFeedback(field: FieldName) {
+  function clearError(field: FieldName) {
     setErrors((previous) => ({
       ...previous,
       [field]: undefined,
     }));
-    setSuccess("");
-    setSubmitError("");
   }
 
   async function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
@@ -71,7 +52,6 @@ export default function RentalForm({ carId }: RentalFormProps) {
 
     const name = String(formData.get("name") ?? "").trim();
     const email = String(formData.get("email") ?? "").trim();
-    const bookingDate = String(formData.get("bookingDate") ?? "");
     const comment = String(formData.get("comment") ?? "").trim();
 
     const nextErrors: FieldErrors = {};
@@ -83,7 +63,7 @@ export default function RentalForm({ carId }: RentalFormProps) {
       nextErrors.name = "Please enter your name.";
     } else if (name.length > 100) {
       nextErrors.name = "Use no more than 100 characters.";
-    } else if (!/^\p{L}[\p{L}\p{M}]*(?:[ '\u2019\u02bc-]\p{L}[\p{L}\p{M}]*)*$/u.test(name)) {
+    } else if (!/^\p{L}[\p{L}\p{M}]*(?:[ '’ʼ-]\p{L}[\p{L}\p{M}]*)*$/u.test(name)) {
       nextErrors.name = "Use letters, spaces, hyphens or apostrophes. Numbers are not allowed.";
     }
 
@@ -93,19 +73,11 @@ export default function RentalForm({ carId }: RentalFormProps) {
       nextErrors.email = "Please enter a valid email address.";
     }
 
-    if (!bookingDate) {
-      nextErrors.bookingDate = "Please choose a booking date.";
-    } else if (bookingDate < getToday()) {
-      nextErrors.bookingDate = "Choose today or a future date.";
-    }
-
     if (comment.length > 1000) {
       nextErrors.comment = "Use no more than 1,000 characters.";
     }
 
     setErrors(nextErrors);
-    setSuccess("");
-    setSubmitError("");
 
     const firstInvalidField = Object.keys(nextErrors)[0];
 
@@ -126,17 +98,15 @@ export default function RentalForm({ carId }: RentalFormProps) {
       await createBookingRequest(carId, {
         name,
         email,
-        comment: [`Requested booking date: ${bookingDate}`, comment]
-          .filter(Boolean)
-          .join("\n"),
+        ...(comment && { comment }),
       });
 
       form.reset();
-      setSuccess(
+      toast.success(
         "Your booking request has been sent! We will contact you to confirm the details.",
       );
     } catch {
-      setSubmitError("Could not send your request. Please try again.");
+      toast.error("Could not send your request. Please try again.");
     } finally {
       submittingRef.current = false;
       setIsSubmitting(false);
@@ -183,10 +153,9 @@ export default function RentalForm({ carId }: RentalFormProps) {
                   placeholder={`${field.label}*`}
                   autoComplete={field.autoComplete}
                   maxLength={field.name === "name" ? 100 : undefined}
-                  min={field.type === "date" ? getToday() : undefined}
                   aria-invalid={Boolean(error)}
                   aria-describedby={error ? `${inputId}-error` : undefined}
-                  onChange={() => clearFeedback(field.name)}
+                  onChange={() => clearError(field.name)}
                   required
                 />
                 {error && <Icon name="error" size={24} className={css.errorIcon} />}
@@ -218,7 +187,7 @@ export default function RentalForm({ carId }: RentalFormProps) {
               aria-describedby={
                 errors.comment ? `${formId}-comment-error` : undefined
               }
-              onChange={() => clearFeedback("comment")}
+              onChange={() => clearError("comment")}
             />
             {errors.comment && <Icon name="error" size={24} className={css.errorIcon} />}
           </div>
@@ -234,14 +203,6 @@ export default function RentalForm({ carId }: RentalFormProps) {
       <button className={css.button} type="submit" disabled={isSubmitting}>
         {isSubmitting ? "Sending..." : "Send"}
       </button>
-
-      <div role="status" aria-atomic="true">
-        {success && <p className={css.success}>{success}</p>}
-      </div>
-
-      <div role="alert" aria-atomic="true">
-        {submitError && <p className={css.submitError}>{submitError}</p>}
-      </div>
     </form>
   );
 }
